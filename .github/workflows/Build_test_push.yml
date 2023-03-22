@@ -1,0 +1,64 @@
+name: Build, test and push to MyGet
+
+on:
+  # Triggers the workflow on push or pull request events
+  push:
+    branches: [ test ] # Add "main"  later
+  #pull_request:
+  #  branches: [ main, test ]
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  Build:
+    runs-on: windows-latest
+
+    env:
+      DOTNET_VERSION: '6.0.401'
+      SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
+      SOLUTION_RELEASE: 'Release' # Debug or Release
+      MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
+      OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
+      OCTOPUS_SPACE: 'Calculus'
+      OCTOPUS_PROJECT: 'CDV'
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
+        with:
+          version: latest
+
+      - name: Restore NuGet packages
+        run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
+
+      - name: Dotnet Build
+        run: dotnet build --no-restore ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.SOLUTION_RELEASE }}
+
+      #- name: Dotnet Publish
+      #  run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+
+      #- name: Octo Pack
+      #  run: octo pack --id=${{ env.SOLUTION_NAME }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+
+      #- name: Push to MyGet
+      #  if: "${{ success() }}"
+      #  run: dotnet nuget push ${{ runner.temp }}\octopackages\*.nupkg --api-key ${{ secrets.MYGET_API_KEY }} --source ${{ env.MYGET_REPO }}
+
+      #- name: Create a release in Octopus Deploy
+      #  uses: OctopusDeploy/create-release-action@v3
+      #  with:
+      #    api_key: ${{ secrets.OCTOPUS_API_KEY }}
+      #    project: ${{ env.OCTOPUS_PROJECT }}
+      #    space: ${{ env.OCTOPUS_SPACE }}
+      #    server: ${{ env.OCTOPUS_SERVER }}
+      #    proxy: ${{ steps.octo_proxy.outputs.proxy_location }}
+      #    packages_folder: ${{ runner.temp }}\octopackages
