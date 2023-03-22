@@ -43,11 +43,11 @@ jobs:
       - name: Dotnet Build
         run: dotnet build --no-restore ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.SOLUTION_RELEASE }}
 
-      #- name: Dotnet Publish
-      #  run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+      - name: Dotnet Publish
+        run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
 
-      #- name: Octo Pack
-      #  run: octo pack --id=${{ env.SOLUTION_NAME }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+      - name: Octo Pack
+        run: octo pack --id=${{ env.SOLUTION_NAME }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
 
       #- name: Push to MyGet
       #  if: "${{ success() }}"
