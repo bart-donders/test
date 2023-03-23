@@ -1,4 +1,5 @@
 name: SonarCloud
+# https://sonarcloud.io/project/configuration?id=topicushealthcare_cdv&analysisMode=GitHubActions
 
 on:
   # Triggers the workflow on push or pull request events
