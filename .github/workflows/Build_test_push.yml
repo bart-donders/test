@@ -17,7 +17,7 @@ jobs:
     env:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
-      SOLUTION_RELEASE: 'Release' # Debug or Release
+      BUILD_CONFIGURATION: 'Debug' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
@@ -50,7 +50,10 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
 
       - name: Dotnet Build
-        run: dotnet build --no-restore ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.SOLUTION_RELEASE }}
+        run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        
+      - name: Dotnet Test
+        run: dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings coverage.runsettings.xml --logger="trx;" --nologo
 
       - name: Dotnet Publish
         run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
