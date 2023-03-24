@@ -17,11 +17,11 @@ jobs:
     env:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
-      SOLUTION_RELEASE: 'Release' # Debug or Release
+      BUILD_CONFIGURATION: 'Debug' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
-      OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
-      OCTOPUS_PROJECT: 'CDV'
+      OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
+      OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'
 
     steps:
       - name: Git Checkout
@@ -36,18 +36,30 @@ jobs:
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
         with:
           version: latest
+          
+      - name: Cache NuGet packages
+        id: nuget-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-          
 
-      - name: Restore NuGet packages
+      - name: Restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
 
       - name: Dotnet Build
-        run: dotnet build --no-restore ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.SOLUTION_RELEASE }}
+        run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        
+      - name: Dotnet Test
+        run: dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings coverage.runsettings.xml --logger="trx;" --nologo
 
-      #- name: Dotnet Publish
-      #  run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+      - name: Dotnet Publish
+        run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
 
-      #- name: Octo Pack
-      #  run: octo pack --id=${{ env.SOLUTION_NAME }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.SOLUTION_NAME }}
+      - name: Octo Pack
+        run: octo pack --id=${{ env.OCTOPUS_FOLDER }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
 
       #- name: Push to MyGet
       #  if: "${{ success() }}"
@@ -57,7 +69,7 @@ jobs:
       #  uses: OctopusDeploy/create-release-action@v3
       #  with:
       #    api_key: ${{ secrets.OCTOPUS_API_KEY }}
-      #    project: ${{ env.OCTOPUS_PROJECT }}
+      #    project: ${{ env.SOLUTION_NAME }}
       #    space: ${{ env.OCTOPUS_SPACE }}
       #    server: ${{ env.OCTOPUS_SERVER }}
       #    proxy: ${{ steps.octo_proxy.outputs.proxy_location }}
