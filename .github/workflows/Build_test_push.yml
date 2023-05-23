@@ -16,6 +16,7 @@ jobs:
 
     env:
       DOTNET_VERSION: '6.0.401'
+      VS_VERSION: '[17.3, 17.4)'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Debug' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
@@ -31,6 +32,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          vs-version: ${{ env.VS_VERSION }}
 
       - name: Install Octopus CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
