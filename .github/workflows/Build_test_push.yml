@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      DOTNET_VERSION: '6.0.401'
+      DOTNET_VERSION: '6.0.401 7.0.203'
       VS_VERSION: '[17.3, 17.4)'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Debug' # Debug or Release
@@ -32,11 +32,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          
-      - name: Add msbuild to PATH for compatible version with Dotnet
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          vs-version: ${{ env.VS_VERSION }}
 
       - name: Install Octopus CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
