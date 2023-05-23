@@ -32,6 +32,10 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          
+      - name: Add msbuild to PATH for compatible version with Dotnet
+        uses: microsoft/setup-msbuild@v1.1
+        with:
           vs-version: ${{ env.VS_VERSION }}
 
       - name: Install Octopus CLI
