@@ -16,7 +16,6 @@ jobs:
 
     env:
       DOTNET_VERSION: '6.0.401 7.0.203'
-      VS_VERSION: '[17.3, 17.4)'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Debug' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
