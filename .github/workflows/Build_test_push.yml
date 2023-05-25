@@ -15,9 +15,9 @@ jobs:
     runs-on: windows-latest
 
     env:
-      DOTNET_VERSION: '6.0.401 7.0.203'
+      DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
-      BUILD_CONFIGURATION: 'Debug' # Debug or Release
+      BUILD_CONFIGURATION: 'Release' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
