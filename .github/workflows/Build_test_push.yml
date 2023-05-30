@@ -30,8 +30,8 @@ jobs:
 
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+        #with:
+        #  dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1        
