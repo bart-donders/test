@@ -16,7 +16,6 @@ jobs:
 
     env:
       DOTNET_VERSION: '6.0.401'
-      VS_VERSION: '[17.3, 17.4)'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
@@ -35,8 +34,6 @@ jobs:
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1        
-        #with:
-        #  vs-version: ${{ env.VS_VERSION }}
 
       - name: Install Octopus CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
@@ -56,7 +53,7 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
 
       - name: Build using msbuild
-        run: msbuild /m ${{ env.SOLUTION_NAME }}.sln /p:TreatWarningsAsErrors=false /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:DebugSymbols=true /p:DebugType=PdbOnly /clp:ErrorsOnly /nr:false /p:WarningsAsErrors="S1128"
+        run: msbuild /m ${{ env.SOLUTION_NAME }}.sln /p:TreatWarningsAsErrors=false /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:DebugSymbols=true /p:DebugType=PdbOnly /p:WarningsAsErrors="S1128" /clp:ErrorsOnly /nr:false 
 
       #- name: Dotnet Build
       #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
