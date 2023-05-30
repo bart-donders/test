@@ -3,7 +3,7 @@ name: Build, test and push to MyGet
 on:
   # Triggers the workflow on push or pull request events
   push:
-    branches: [ test ] # Add "main"  later
+    branches: [ test ] # Add "main" later
   #pull_request:
   #  branches: [ main, test ]
     
@@ -27,16 +27,16 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
-        
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1        
-        with:
-          vs-version: ${{ env.VS_VERSION }}
 
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1        
+        with:
+          vs-version: ${{ env.VS_VERSION }}
 
       - name: Install Octopus CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
