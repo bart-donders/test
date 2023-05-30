@@ -16,6 +16,7 @@ jobs:
 
     env:
       DOTNET_VERSION: '6.0.401'
+      VS_VERSION: '[17.3, 17.4)'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
@@ -26,6 +27,11 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
+        
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1        
+        with:
+          vs-version: ${{ env.VS_VERSION }}
 
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
@@ -49,8 +55,11 @@ jobs:
       - name: Restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
 
-      - name: Dotnet Build
-        run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+      - name: msbuild Build
+        run: msbuild /m ${{ env.SOLUTION_NAME }}.sln /p:TreatWarningsAsErrors=false /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:DebugSymbols=true /p:DebugType=PdbOnly /clp:ErrorsOnly /nr:false /p:WarningsAsErrors="S1128"
+
+      #- name: Dotnet Build
+      #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
         
       - name: Dotnet Test
         run: dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings coverage.runsettings.xml --logger="trx;" --nologo
