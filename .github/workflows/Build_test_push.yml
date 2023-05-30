@@ -55,7 +55,7 @@ jobs:
       - name: Restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
 
-      - name: msbuild Build
+      - name: Build using msbuild
         run: msbuild /m ${{ env.SOLUTION_NAME }}.sln /p:TreatWarningsAsErrors=false /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:DebugSymbols=true /p:DebugType=PdbOnly /clp:ErrorsOnly /nr:false /p:WarningsAsErrors="S1128"
 
       #- name: Dotnet Build
