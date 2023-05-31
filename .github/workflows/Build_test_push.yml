@@ -64,7 +64,9 @@ jobs:
       #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
         
       - name: Dotnet Test
-        run: dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings coverage.runsettings.xml --logger="trx;" --nologo
+        run: |
+          dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings TestConsoleApp.test.runsettings.xml --logger="trx;" --nologo
+          echo "All tests finished"
 
       - name: Dotnet Publish
         run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
