@@ -50,8 +50,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-          
 
-      - name: Nuget restore solution and NuGet packages
-        run: nuget restore ${{ env.SOLUTION_NAME }}.sln
+      #- name: Nuget restore solution and NuGet packages
+      #  run: nuget restore ${{ env.SOLUTION_NAME }}.sln
 
       - name: Dotnet restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
