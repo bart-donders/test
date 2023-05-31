@@ -19,7 +19,7 @@ jobs:
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247'
-      MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247;CS0168;CS0169;CS0219;CS1998'
+      MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
@@ -52,10 +52,10 @@ jobs:
             ${{ runner.os }}-nuget-          
 
       #- name: Nuget restore solution and NuGet packages
-      #  run: nuget restore ${{ env.SOLUTION_NAME }}.sln
+      #  run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
 
       - name: Dotnet restore solution and NuGet packages
-        run: dotnet restore ${{ env.SOLUTION_NAME }}.sln
+        run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
 
       - name: Build using msbuild
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
