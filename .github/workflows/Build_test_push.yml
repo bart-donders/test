@@ -18,7 +18,7 @@ jobs:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
-      MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998;" /warnaserror:MSB3247'
+      MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168,CS0169,CS0219,CS1998" /warnaserror:MSB3247'
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
