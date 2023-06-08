@@ -17,11 +17,20 @@ jobs:
     env:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
+      READABLE_PACKAGE_VERSION: '1234'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
-      MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247;CS0168;CS0169;CS0219;CS1998'
+      MSBUILD_FLAGS_DEBUG: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
+      MSBUILD_FLAGS_RELEASE: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247 /p:RunOctoPack=true" /p:OctoPackPublishPackageToFileShare="${{ env.OCTOPUS_PACKAGE_DIR }}" /p:OctoPackPackageVersion="${{ env.READABLE_PACKAGE_VERSION }}"'
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
+      OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
+      OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
+      OCTOPUS_SPACE_ID: '5'
+      OCTOPUS_PROJECT: 'CDV'
+      OCTOPUS_CHANNEL: "${{ env.OCTOPUS_CHANNEL ? env.OCTOPUS_CHANNEL : '' }}"
+      OCTOPUS_VERSION_LABEL: "${{ env.OCTOPUS_VERSION_LABEL ? env.OCTOPUS_VERSION_LABEL : '' }}"
+      OCTOPUS_PACKAGE_DIR: '${{ runner.temp }}\octo_packages'      
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'
 
@@ -63,8 +72,12 @@ jobs:
       - name: Dotnet restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
 
-      - name: Build using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
+      - name: Build Debug version using msbuild
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS_DEBUG }}
+        if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
+      - name: Build Release version using msbuild
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS_DEBUG }}
+        if: ${{ env.BUILD_CONFIGURATION == 'Realease' }}
         
       #- name: Dotnet Build
       #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
@@ -74,11 +87,10 @@ jobs:
           dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
           echo "All tests finished"
 
-      - name: Dotnet Publish
-        run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-
-      - name: Octo Pack
-        run: octo pack --id=${{ env.OCTOPUS_FOLDER }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+      - name: Dotnet Publish and Octo pack
+        run: |
+          dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${env.OCTOPUS_PACKAGE_DIR} --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
 
       #- name: Push to MyGet
       #  if: "${{ success() }}"
