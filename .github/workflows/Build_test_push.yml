@@ -18,11 +18,6 @@ jobs:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       READABLE_PACKAGE_VERSION: '1234'
-      BUILD_CONFIGURATION: 'Release' # Debug or Release
-      MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
-      MSBUILD_FLAGS_DEBUG: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
-      MSBUILD_FLAGS_RELEASE: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247 /p:RunOctoPack=true" /p:OctoPackPublishPackageToFileShare="${{ OCTOPUS_PACKAGE_DIR }}" /p:OctoPackPackageVersion="${{ READABLE_PACKAGE_VERSION }}"'
-      MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
@@ -32,7 +27,11 @@ jobs:
       OCTOPUS_VERSION_LABEL: "${{ OCTOPUS_VERSION_LABEL ? OCTOPUS_VERSION_LABEL : '' }}"
       OCTOPUS_PACKAGE_DIR: '${{ runner.temp }}\octo_packages'      
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
-      OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'
+      OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'      BUILD_CONFIGURATION: 'Release' # Debug or Release
+      MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
+      MSBUILD_FLAGS_DEBUG: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
+      MSBUILD_FLAGS_RELEASE: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247 /p:RunOctoPack=true" /p:OctoPackPublishPackageToFileShare="${{ OCTOPUS_PACKAGE_DIR }}" /p:OctoPackPackageVersion="${{ READABLE_PACKAGE_VERSION }}"'
+      MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
 
     steps:
       - name: Git Checkout
