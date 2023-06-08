@@ -20,8 +20,7 @@ jobs:
       READABLE_PACKAGE_VERSION: '1234'
       BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
-      MSBUILD_FLAGS_DEBUG: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
-      MSBUILD_FLAGS_RELEASE: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247 /p:RunOctoPack=true" /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ READABLE_PACKAGE_VERSION }}"'
+      MSBUILD_FLAGS '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
@@ -70,10 +69,10 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
 
       - name: Build Debug version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS_DEBUG }}
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
         if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
       - name: Build Release version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS_DEBUG }}
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true" /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ READABLE_PACKAGE_VERSION }}"
         if: ${{ env.BUILD_CONFIGURATION == 'Realease' }}
         
       #- name: Dotnet Build
