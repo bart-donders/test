@@ -51,8 +51,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-          
 
-      #- name: Nuget restore solution and NuGet packages
-      #  run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
+      - name: Show versions
+        run: |
+          git status
+          dotnet --version
+          msbuild /version
+          powershell '$PSVersionTable.PSVersion'
+          
+      - name: Nuget restore solution and NuGet packages
+        run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
 
       - name: Dotnet restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
@@ -65,7 +72,7 @@ jobs:
         
       - name: Dotnet Test
         run: |
-          dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings TestConsoleApp.test.runsettings.xml --logger="trx;" --nologo
+          #dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
           echo "All tests finished"
 
       - name: Dotnet Publish
