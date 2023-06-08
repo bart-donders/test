@@ -72,7 +72,7 @@ jobs:
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
         if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
       - name: Build Release version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ READABLE_PACKAGE_VERSION }}"
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.READABLE_PACKAGE_VERSION }}"
         if: ${{ env.BUILD_CONFIGURATION == 'Realease' }}
         
       #- name: Dotnet Build
