@@ -56,7 +56,6 @@ jobs:
           git status
           dotnet --version
           msbuild /version
-          powershell '$PSVersionTable.PSVersion'
           
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
@@ -72,14 +71,14 @@ jobs:
         
       - name: Dotnet Test
         run: |
-          #dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
+          dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
           echo "All tests finished"
 
       - name: Dotnet Publish
-        run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
+        run: dotnet publish --no-restore ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
 
       - name: Octo Pack
-        run: octo pack --id=${{ env.OCTOPUS_FOLDER }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\publish\${{ env.OCTOPUS_FOLDER }}
+        run: octo pack --id=${{ env.OCTOPUS_FOLDER }} --outfolder=${{ runner.temp }}\octopackages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
 
       #- name: Push to MyGet
       #  if: "${{ success() }}"
