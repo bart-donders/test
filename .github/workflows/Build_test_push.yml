@@ -73,15 +73,13 @@ jobs:
         if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
       - name: Build Release version using msbuild
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.READABLE_PACKAGE_VERSION }}"
-        if: ${{ env.BUILD_CONFIGURATION == 'Realease' }}
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
         
       #- name: Dotnet Build
       #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
         
       - name: Dotnet Test
-        run: |
-          dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
-          echo "All tests finished"
+        run:  dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
 
       - name: Dotnet Publish and Octo pack
         run: |
