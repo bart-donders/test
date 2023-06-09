@@ -56,11 +56,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-          
 
-      - name: Show versions
+      - name: Show versions and cache hit
         run: |
           git status
           dotnet --version
           msbuild /version
+          echo "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
+          
+      #- name: Early exit
+      #  run: |
+      #    gh run cancel ${{ github.run_id }}
+      #    gh run watch ${{ github.run_id }}
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
           
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
@@ -85,6 +93,7 @@ jobs:
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
           octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+        #if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       #- name: Push to MyGet
       #  if: "${{ success() }}"
