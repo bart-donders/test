@@ -89,7 +89,7 @@ jobs:
       - name: Dotnet Publish and Octo pack
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+          #octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       - name: Push to MyGet
