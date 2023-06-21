@@ -66,21 +66,7 @@ jobs:
           Write-Output "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
           Write-Output "GITHUB_REF_NAME: " ${{ github.ref_name }}
           Write-Output "GITHUB_SHA: " ${{ github.sha }}
-          
-      - name: Install Octopus CLI
-        uses: OctopusDeploy/install-octopus-cli-action@v1
-        with:
-          version: latest
-      - name: Create a release in Octopus Deploy
-        run:  octo create-release --project="CDV" --space="Calculus" --version="1.2.3" --channel="Feature" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}
-          
-      - name: Early exit
-        run: |
-          gh run cancel ${{ github.run_id }}
-          gh run watch ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
-          
+
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
 
@@ -108,7 +94,21 @@ jobs:
 
       - name: Push to MyGet
         if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
-        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }}      
+        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }}     
+        
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: latest
+      - name: Create a release in Octopus Deploy
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="Test Bart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}
+          
+      #- name: Early exit
+      #  run: |
+      #    gh run cancel ${{ github.run_id }}
+      #    gh run watch ${{ github.run_id }}
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}             
             
       #- name: Create a release in Octopus Deploy
       #  uses: OctopusDeploy/create-release-action@v3
