@@ -63,9 +63,9 @@ jobs:
           msbuild /version
           Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
           Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}
-          Write-Output "GITHUB_RUN_NUMBER: " ${{ GITHUB_RUN_NUMBER }}
-          Write-Output "GITHUB_REF_NAME: " ${{ GITHUB_REF_NAME }}
-          Write-Output "GITHUB_SHA: " ${{ GITHUB_SHA }}
+          Write-Output "GITHUB_RUN_NUMBER: " $GITHUB_RUN_NUMBER
+          Write-Output "GITHUB_REF_NAME: " $GITHUB_REF_NAME
+          Write-Output "GITHUB_SHA: " $GITHUB_SHA
           Write-Output "GITHUB_RUN_NUMBER: " ${{ env.GITHUB_RUN_NUMBER }}
           Write-Output "GITHUB_REF_NAME: " ${{ env.GITHUB_REF_NAME }}
           Write-Output "GITHUB_SHA: " ${{ env.GITHUB_SHA }}
