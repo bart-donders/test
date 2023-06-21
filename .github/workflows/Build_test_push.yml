@@ -107,7 +107,7 @@ jobs:
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       - name: Push to MyGet
-        if: "${{ success() && $env.BUILD_CONFIGURATION == 'Release' }}"
+        if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
         run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }}      
             
       #- name: Create a release in Octopus Deploy
