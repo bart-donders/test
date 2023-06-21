@@ -18,7 +18,7 @@ jobs:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       READABLE_PACKAGE_VERSION: '1234'
-      BUILD_CONFIGURATION: 'Debug' # Debug or Release
+      BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
@@ -61,15 +61,12 @@ jobs:
           git status
           dotnet --version
           msbuild /version
-          echo "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
-          
-      #- name: Early exit
-      #  run: |
-      #    gh run cancel ${{ github.run_id }}
-      #    gh run watch ${{ github.run_id }}
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
-          
+          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
+          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}         
+          Write-Output "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
+          Write-Output "GITHUB_REF_NAME: " ${{ github.ref_name }}
+          Write-Output "GITHUB_SHA: " ${{ github.sha }}
+
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
 
@@ -92,13 +89,27 @@ jobs:
       - name: Dotnet Publish and Octo pack
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-        #if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+          #octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
-      #- name: Push to MyGet
-      #  if: "${{ success() }}"
-      #  run: dotnet nuget push ${{ runner.temp }}\octopackages\*.nupkg --api-key ${{ secrets.MYGET_API_KEY }} --source ${{ env.MYGET_REPO }}
-
+      - name: Push to MyGet
+        if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
+        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }}     
+        
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: latest
+      - name: Create a release in Octopus Deploy
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="Test Bart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}
+          
+      #- name: Early exit
+      #  run: |
+      #    gh run cancel ${{ github.run_id }}
+      #    gh run watch ${{ github.run_id }}
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}             
+            
       #- name: Create a release in Octopus Deploy
       #  uses: OctopusDeploy/create-release-action@v3
       #  with:
