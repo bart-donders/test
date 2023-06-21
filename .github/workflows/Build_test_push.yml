@@ -61,14 +61,17 @@ jobs:
           git status
           dotnet --version
           msbuild /version
-          echo "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
+          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
+          Write-Output "GITHUB_RUN_NUMBER:" GITHUB_RUN_NUMBER
+          Write-Output "GITHUB_REF_NAME:" GITHUB_REF_NAME
+          Write-Output "GITHUB_SHA:" GITHUB_SHA
           
-      #- name: Early exit
-      #  run: |
-      #    gh run cancel ${{ github.run_id }}
-      #    gh run watch ${{ github.run_id }}
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+      - name: Early exit
+        run: |
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
           
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
