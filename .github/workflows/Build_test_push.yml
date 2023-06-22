@@ -67,9 +67,7 @@ jobs:
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
         
       - name: Show Nuget cache hit
-        run: |
-          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
-          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}         
+        run: Write-Output "Nuget cache hit "  ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}
 
       - name: Build Debug version using msbuild
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
@@ -84,6 +82,11 @@ jobs:
       - name: Dotnet Test
         run:  dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
 
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: latest
+          
       - name: Dotnet Publish and Octo pack
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
@@ -94,10 +97,6 @@ jobs:
         if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
         run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
-      - name: Install Octopus CLI
-        uses: OctopusDeploy/install-octopus-cli-action@v1
-        with:
-          version: latest
       - name: Create a release in Octopus Deploy
         run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="Test Bart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} 
 
