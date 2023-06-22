@@ -91,7 +91,7 @@ jobs:
       - name: Dotnet Publish and Octo pack for .Net (Core) projects          
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       - name: Push to MyGet
