@@ -94,25 +94,14 @@ jobs:
           octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
-      # --timeout (default 300 seconds)
-      - name: Push to MyGet
-        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }}
-        if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
+      #- name: Push to MyGet
+      #  run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
+      #  if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
         
       - name: Create a release in Octopus Deploy
-        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="TestBart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} 
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} 
         if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
-        
-      #- name: Create a release in Octopus Deploy
-      #  uses: OctopusDeploy/create-release-action@v3
-      #  with:
-      #    api_key: ${{ secrets.OCTOPUS_API_KEY }}
-      #    project: ${{ env.SOLUTION_NAME }}
-      #    space: ${{ env.OCTOPUS_SPACE }}
-      #    server: ${{ env.OCTOPUS_SERVER }}
-      #    proxy: ${{ steps.octo_proxy.outputs.proxy_location }}
-      #    packages_folder: ${{ runner.temp }}\octopackages
-      
+            
       #- name: Early exit
       #  run: |
       #    gh run cancel ${{ github.run_id }}
