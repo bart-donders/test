@@ -42,11 +42,6 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1        
 
-      - name: Install Octopus CLI
-        uses: OctopusDeploy/install-octopus-cli-action@v1.1.7
-        with:
-          version: latest
-          
       - name: Cache NuGet packages
         id: nuget-cache
         uses: actions/cache@v3
@@ -56,7 +51,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-          
 
-      - name: Show versions and cache hit
+      - name: Show versions and run info
         run: |
           git status
           dotnet --version
@@ -66,12 +61,18 @@ jobs:
           Write-Output "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
           Write-Output "GITHUB_REF_NAME: " ${{ github.ref_name }}
           Write-Output "GITHUB_SHA: " ${{ github.sha }}
+          Write-Output "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
+          Write-Output "GITHUB_REF_NAME: " ${{ github.ref_name }}
+          Write-Output "GITHUB_SHA: " ${{ github.sha }}        
 
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
 
       - name: Dotnet restore solution and NuGet packages
         run: dotnet restore ${{ env.SOLUTION_NAME }}.sln -verbosity:quiet
+        
+      - name: Show Nuget cache hit
+        run: Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}
 
       - name: Build Debug version using msbuild
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
@@ -89,27 +90,20 @@ jobs:
       - name: Dotnet Publish and Octo pack
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} -o ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          #octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       - name: Push to MyGet
         if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
-        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }}     
+        run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} --source ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
       - name: Install Octopus CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1
         with:
           version: latest
       - name: Create a release in Octopus Deploy
-        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="Test Bart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}
-          
-      #- name: Early exit
-      #  run: |
-      #    gh run cancel ${{ github.run_id }}
-      #    gh run watch ${{ github.run_id }}
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}             
-            
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version="Test Bart" --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} 
+
       #- name: Create a release in Octopus Deploy
       #  uses: OctopusDeploy/create-release-action@v3
       #  with:
@@ -119,3 +113,10 @@ jobs:
       #    server: ${{ env.OCTOPUS_SERVER }}
       #    proxy: ${{ steps.octo_proxy.outputs.proxy_location }}
       #    packages_folder: ${{ runner.temp }}\octopackages
+      
+      #- name: Early exit
+      #  run: |
+      #    gh run cancel ${{ github.run_id }}
+      #    gh run watch ${{ github.run_id }}
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                  
