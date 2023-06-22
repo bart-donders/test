@@ -17,11 +17,11 @@ jobs:
     env:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
-      READABLE_PACKAGE_VERSION: '1234'
-      BUILD_CONFIGURATION: 'Debug' # Debug or Release
+      BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
+      OCTO_PACKAGE_VERSION: '1.2.3'
       OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
@@ -73,7 +73,7 @@ jobs:
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
         if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
       - name: Build Release version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.READABLE_PACKAGE_VERSION }}"
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.OCTO_PACKAGE_VERSION }}"
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
         
       #- name: Dotnet Build
@@ -91,7 +91,7 @@ jobs:
       - name: Dotnet Publish and Octo pack for .Net (Core) projects          
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.READABLE_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
+          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       - name: Push to MyGet
