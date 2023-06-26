@@ -99,7 +99,7 @@ jobs:
       #  if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
         
       - name: Create a release in Octopus Deploy
-        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} 
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Feature" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} --ignoreChannelRules
         if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
             
       #- name: Early exit
