@@ -22,7 +22,6 @@ jobs:
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTO_PACKAGE_VERSION: '1.2.3'
-      OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SPACE_ID: '5'
@@ -31,6 +30,21 @@ jobs:
       OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'      
 
     steps:
+      - name: Notify Slack
+        #if: failure() # Alleen Slack notification bij failure
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: 'GFE5FM8MT' # calculus-robots
+          slack-message: "Test message from Github Actions"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}    
+      - name: Early exit
+        run: |
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
+      
       - name: Git Checkout
         uses: actions/checkout@v3
 
