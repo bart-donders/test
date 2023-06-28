@@ -34,8 +34,8 @@ jobs:
         #if: failure() # Alleen Slack notification bij failure
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: 'CMK620AJU' # calculus-deplys
-          slack-message: "Test message from Github Actions"
+          channel-id: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
+          slack-message: "Test message (2) from Github Actions"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}    
       - name: Early exit
