@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Notify Slack
         #if: failure() # Alleen Slack notification bij failure
-        uses: slackapi/slack-github-action@v1.23.0
+        uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: 'GFE5FM8MT' # calculus-robots
           slack-message: "Test message from Github Actions"
