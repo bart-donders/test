@@ -35,16 +35,16 @@ jobs:
       OCTOPUS_FOLDER: 'TestConsoleApp'
 
     steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}     
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
           
-      - name: Git Checkout
-        uses: actions/checkout@v3
-
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
         with:
