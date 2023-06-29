@@ -123,8 +123,8 @@ jobs:
           
   NotifySuccess:
     name: Notify Slack of succcessful Build job
-    needs: Build # Needs succeful Build job
     runs-on: windows-latest
+    needs: Build # Needs succeful Build job
     steps:
       - name: Notify Slack of successful CI/CD run
         uses: slackapi/slack-github-action@v1.24.0
@@ -135,7 +135,8 @@ jobs:
   NotifyFailure:          
     name: Notify Slack of failed Build job
     runs-on: windows-latest
-    if: ${{ jobs.Build.result == 'failure'}}
+    needs: Build # Needs 'succeful' Build job, but...
+    if: ${{!success()}} # ...only if that one fails
     steps:
       - name: Notify Slack of failed CI/CD run
         if: failure() # any steps failed
