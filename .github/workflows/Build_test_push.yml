@@ -12,6 +12,7 @@ on:
   
 env:
   BUILD_CONFIGURATION: 'Release' # Debug or Release
+  OCTO_PACKAGE_VERSION: '1.2.6'
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
   SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
 
@@ -26,7 +27,6 @@ jobs:
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
       OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
-      OCTO_PACKAGE_VERSION: '1.2.3'
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SPACE_ID: '5'
@@ -115,7 +115,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
-          slack-message: "CI/CD (${{ env.BUILD_CONFIGURATION }}) succesvol afgesloten voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
+          slack-message: "CI/CD (${{ env.BUILD_CONFIGURATION }} version ${{ env.OCTO_PACKAGE_VERSION }}) succesvol afgesloten voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
           
   NotifyFailure:          
     name: Notify Slack of failed Build job
@@ -127,7 +127,7 @@ jobs:
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
-          slack-message: "Error tijdens CI/CD (${{ env.BUILD_CONFIGURATION }}) voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"            
+          slack-message: "Error tijdens CI/CD (${{ env.BUILD_CONFIGURATION }} version ${{ env.OCTO_PACKAGE_VERSION }}) voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"            
                       
       #- name: Early exit
       #  run: |
