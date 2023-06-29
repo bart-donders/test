@@ -9,42 +9,39 @@ on:
     
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+  
+env:
+  BUILD_CONFIGURATION: 'Release' # Debug or Release
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
+  SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
 
 jobs:
   Build:
+    name: 'Build, test, push and create release'
     runs-on: windows-latest
-
     env:
       DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
-      BUILD_CONFIGURATION: 'Release' # Debug or Release
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
+      OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
       OCTO_PACKAGE_VERSION: '1.2.3'
       OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
       OCTOPUS_SPACE: 'Calculus'
       OCTOPUS_SPACE_ID: '5'
       OCTOPUS_PROJECT: 'CDV'
       OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
-      OCTOPUS_FOLDER: 'TestConsoleApp' # 'CDV'      
+      OCTOPUS_FOLDER: 'TestConsoleApp'
 
     steps:
-      - name: Notify Slack
-        #if: failure() # Alleen Slack notification bij failure
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
-          slack-message: "Test message (2) from Github Actions"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}    
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
-      
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}     
+          
       - name: Git Checkout
         uses: actions/checkout@v3
 
@@ -84,11 +81,11 @@ jobs:
         run: Write-Output "Nuget cache hit "  ${{ steps.nuget-cache.outputs.cache-hit == 'true' }}
 
       - name: Build Debug version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
         if: ${{ env.BUILD_CONFIGURATION == 'Debug' }}
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }}
       - name: Build Release version using msbuild
-        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.OCTO_PACKAGE_VERSION }}"
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+        run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.OCTO_PACKAGE_VERSION }}"
         
       #- name: Dotnet Build
       #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
@@ -97,25 +94,56 @@ jobs:
         run:  dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
 
       - name: Install Octopus CLI
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}          
         uses: OctopusDeploy/install-octopus-cli-action@v1
         with:
           version: latest
-        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}          
           
       - name: Dotnet Publish and Octo pack for .Net (Core) projects          
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
           octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
-        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
       #- name: Push to MyGet
+      #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
       #  run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
-      #  if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
         
       - name: Create a release in Octopus Deploy
-        run:  octo create-release --project="CDV" --space="Calculus" --channel="Development" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }} --ignoreChannelRules
-        if: "${{ success() && env.BUILD_CONFIGURATION == 'Release' }}"
-            
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+        run:  octo create-release --project="CDV" --space="Calculus" --channel="Development" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
+        
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
+          slack-message: "Error tijdens CI/CD (${{ env.BUILD_CONFIGURATION }}) voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"         
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}          
+          
+  NotifySuccess:
+    name: Notify Slack of succcessful Build job
+    needs: Build # Needs succeful Build job
+    runs-on: windows-latest
+    steps:
+      - name: Notify Slack of successful CI/CD run
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: ${{ env.SLACK_BOT_CHANNEL }}
+          slack-message: "CI/CD (${{ env.BUILD_CONFIGURATION }}) succesvol afgesloten voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
+          
+  NotifyFailure:          
+    name: Notify Slack of failed Build job
+    runs-on: windows-latest
+    if: ${{ jobs.Build.result == 'failure'}}
+    steps:
+      - name: Notify Slack of failed CI/CD run
+        if: failure() # any steps failed
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          channel-id: ${{ env.SLACK_BOT_CHANNEL }}
+          slack-message: "Error tijdens CI/CD (${{ env.BUILD_CONFIGURATION }}) voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"            
+                      
       #- name: Early exit
       #  run: |
       #    gh run cancel ${{ github.run_id }}
