@@ -35,9 +35,6 @@ jobs:
       OCTOPUS_FOLDER: 'TestConsoleApp'
 
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v3
-
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
@@ -45,6 +42,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
           
+      - name: Git Checkout
+        uses: actions/checkout@v3
+
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
         with:
@@ -139,7 +139,6 @@ jobs:
     if: ${{!success()}} # ...only if that one fails
     steps:
       - name: Notify Slack of failed CI/CD run
-        if: failure() # any steps failed
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
