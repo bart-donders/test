@@ -97,7 +97,7 @@ jobs:
 
       - name: Push to MyGet
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.ORG_MYGET_API_TOKEN }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
+        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
         #run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
       #- name: Create a release in Octopus Deploy
