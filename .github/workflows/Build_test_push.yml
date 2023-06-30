@@ -80,9 +80,6 @@ jobs:
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
         run: msbuild ${{ env.SOLUTION_NAME }}.sln /p:configuration=${{ env.BUILD_CONFIGURATION }} ${{ env.MSBUILD_FLAGS }} /p:RunOctoPack=true /p:OctoPackPublishPackageToFileShare="${{ runner.temp }}\octo_packages" /p:OctoPackPackageVersion="${{ env.OCTO_PACKAGE_VERSION }}"
         
-      #- name: Dotnet Build
-      #  run: dotnet build ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
-        
       - name: Dotnet Test
         run:  dotnet test ${{ env.SOLUTION_NAME }}.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore --no-build --collect:"XPlat Code Coverage" --results-directory reports --settings Unit.runsettings --logger="trx;" --nologo
 
@@ -98,9 +95,10 @@ jobs:
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
           octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
 
-      #- name: Push to MyGet
-      #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
+      - name: Push to MyGet
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.ORG_MYGET_API_TOKEN }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
+        #run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
