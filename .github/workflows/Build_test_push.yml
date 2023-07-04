@@ -35,6 +35,17 @@ jobs:
       OCTOPUS_FOLDER: 'TestConsoleApp'
 
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo '$GITHUB_CONTEXT'
+      - name: Early exit
+        run: |
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}           
+        
       - name: Git Checkout
         uses: actions/checkout@v3
 
