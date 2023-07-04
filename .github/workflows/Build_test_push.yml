@@ -43,7 +43,7 @@ jobs:
         run: |
           "OCTO_PACKAGE_VERSION='1.2.1'" >> "$GITHUB_ENV"
           if $BRANCH == 'master' if $GITHUB_EVENT_NAME == 'push' echo "OCTO_PACKAGE_VERSION='1.2.2'" >> "$GITHUB_ENV"
-          shell: cmd
+        shell: cmd
       - name: Check environment variable OCTO_PACKAGE_VERSION
         run: |
           echo "OCTO_PACKAGE_VERSION: " ${{ env.OCTO_PACKAGE_VERSION }}
