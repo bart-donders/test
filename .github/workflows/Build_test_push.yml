@@ -41,14 +41,9 @@ jobs:
         run: echo '$GITHUB_CONTEXT'
       - name: Set environment variable OCTO_PACKAGE_VERSION
         run: |
-          if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
-          {
-            Write-Output "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
-          }
-          else
-          {
-            Write-Output "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
-          }
+          "OCTO_PACKAGE_VERSION='1.2.1'" >> "$GITHUB_ENV"
+          if $BRANCH == 'master' if $GITHUB_EVENT_NAME == 'push' echo "OCTO_PACKAGE_VERSION='1.2.2'" >> "$GITHUB_ENV"
+          shell: cmd
       - name: Check environment variable OCTO_PACKAGE_VERSION
         run: |
           echo "OCTO_PACKAGE_VERSION: " ${{ env.OCTO_PACKAGE_VERSION }}
