@@ -39,6 +39,16 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo '$GITHUB_CONTEXT'
+      - name: Set environment variable OCTO_PACKAGE_VERSION
+        run: |
+          if [[ $BRANCH == 'master' && $GITHUB_EVENT_NAME == 'push' ]]; then
+              echo "OCTO_PACKAGE_VERSION= 1.2.3" >> "$GITHUB_ENV"
+          else
+              echo "OCTO_PACKAGE_VERSION= 1.2.4" >> "$GITHUB_ENV"
+          fi        
+      - name: Check environment variable OCTO_PACKAGE_VERSION
+        run: |
+              echo {{ env.OCTO_PACKAGE_VERSION }}
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
