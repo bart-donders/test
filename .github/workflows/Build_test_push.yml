@@ -51,7 +51,7 @@ jobs:
           }
       - name: Check environment variable OCTO_PACKAGE_VERSION
         run: |
-              echo {{ env.OCTO_PACKAGE_VERSION }}
+              echo "OCTO_PACKAGE_VERSION: " ${{ env.OCTO_PACKAGE_VERSION }}
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
