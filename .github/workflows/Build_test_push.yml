@@ -42,21 +42,24 @@ jobs:
       - name: Set environment variable OCTO_PACKAGE_VERSION
         id: set_OCTO_PACKAGE_VERSION
         run: |
-          Write-Host "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
-          #if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
-          #{
-          #  Write-Host "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
-          #}
+          chcp 65001 # Set code page to utf-8
+          echo ("OCTO_PACKAGE_VERSION='1.2.3'" >> $env:GITHUB_ENV
+      #  run: |
+      #    Write-Host "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
+      #    #if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
+      #    #{
+      #    #  Write-Host "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
+      #    #}
       - name: Check environment variable OCTO_PACKAGE_VERSION
         id: get_OCTO_PACKAGE_VERSION
         run: |
           echo ${{ env.OCTO_PACKAGE_VERSION }}  " as OCTO_PACKAGE_VERSION: "
-      #- name: Early exit
-      #  run: |
-      #    gh run cancel ${{ github.run_id }}
-      #    gh run watch ${{ github.run_id }}
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}              
+      - name: Early exit
+        run: |
+          gh run cancel ${{ github.run_id }}
+          gh run watch ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}              
         
       - name: Git Checkout
         uses: actions/checkout@v3
