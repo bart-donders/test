@@ -38,12 +38,6 @@ jobs:
         run: |
           chcp 65001 # Set code page to utf-8
           echo "OCTO_PACKAGE_VERSION=${{ github.event.repository.name }}_${{ github.ref_name }}_${{ env.BUILD_CONFIGURATION }}_${{ github.run_number }}" >> $env:GITHUB_ENV
-      - name: Early exit
-        run: |
-          gh run cancel ${{ github.run_id }}
-          gh run watch ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
       
       - name: Git Checkout
         uses: actions/checkout@v3
