@@ -42,15 +42,15 @@ jobs:
       - name: Set environment variable OCTO_PACKAGE_VERSION
         id: set_OCTO_PACKAGE_VERSION
         run: |
-          echo "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
+          Write-Host "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
           #if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
           #{
-          #  echo "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
+          #  Write-Host "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
           #}
       - name: Check environment variable OCTO_PACKAGE_VERSION
         id: get_OCTO_PACKAGE_VERSION
         run: |
-          echo "OCTO_PACKAGE_VERSION: " ${{ env.OCTO_PACKAGE_VERSION }}
+          echo ${{ env.OCTO_PACKAGE_VERSION }}  " as OCTO_PACKAGE_VERSION: "
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
@@ -126,17 +126,23 @@ jobs:
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
       #  run:  octo create-release --project="CDV" --space="Calculus" --channel="Development" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
-        
-  NotifySuccess:
-    name: Notify Slack of succcessful Build job
-    runs-on: windows-latest
-    needs: Build # Needs succeful Build job
-    steps:
+      
       - name: Notify Slack of successful CI/CD run
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
           slack-message: "CI/CD (${{ env.BUILD_CONFIGURATION }} version ${{ env.OCTO_PACKAGE_VERSION }}) succesvol afgesloten voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
+        
+  #NotifySuccess:
+  #  name: Notify Slack of succcessful Build job
+  #  runs-on: windows-latest
+  #  needs: Build # Needs succeful Build job
+  #  steps:
+  #    - name: Notify Slack of successful CI/CD run
+  #      uses: slackapi/slack-github-action@v1.24.0
+  #      with:
+  #        channel-id: ${{ env.SLACK_BOT_CHANNEL }}
+  #        slack-message: "CI/CD (${{ env.BUILD_CONFIGURATION }} version ${{ env.OCTO_PACKAGE_VERSION }}) succesvol afgesloten voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
           
   NotifyFailure:          
     name: Notify Slack of failed Build job
