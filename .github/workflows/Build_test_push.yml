@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   
 env:
-  BUILD_CONFIGURATION: 'Debug' # Debug or Release
+  BUILD_CONFIGURATION: 'Release' # Debug or Release
   #OCTO_PACKAGE_VERSION: '1.2.6'
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
   SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
@@ -43,7 +43,7 @@ jobs:
         id: set_OCTO_PACKAGE_VERSION
         run: |
           chcp 65001 # Set code page to utf-8
-          echo ("OCTO_PACKAGE_VERSION='1.2.3'" >> $env:GITHUB_ENV
+          echo "OCTO_PACKAGE_VERSION='1.2.3'" >> $env:GITHUB_ENV
       #  run: |
       #    Write-Host "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
       #    #if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
