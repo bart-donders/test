@@ -40,11 +40,15 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo '$GITHUB_CONTEXT'
       - name: Set environment variable OCTO_PACKAGE_VERSION
+        id: set_OCTO_PACKAGE_VERSION
         run: |
-          "OCTO_PACKAGE_VERSION='1.2.1'" >> "$GITHUB_ENV"
-          if $BRANCH == 'master' if $GITHUB_EVENT_NAME == 'push' echo "OCTO_PACKAGE_VERSION='1.2.2'" >> "$GITHUB_ENV"
-        shell: cmd
+          echo "OCTO_PACKAGE_VERSION='1.2.4'" >> "$GITHUB_ENV"
+          #if ($BRANCH -eq 'master' -and $GITHUB_EVENT_NAME -eq 'push')
+          #{
+          #  echo "OCTO_PACKAGE_VERSION='1.2.3'" >> "$GITHUB_ENV"
+          #}
       - name: Check environment variable OCTO_PACKAGE_VERSION
+        id: get_OCTO_PACKAGE_VERSION
         run: |
           echo "OCTO_PACKAGE_VERSION: " ${{ env.OCTO_PACKAGE_VERSION }}
       - name: Early exit
@@ -52,7 +56,7 @@ jobs:
           gh run cancel ${{ github.run_id }}
           gh run watch ${{ github.run_id }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}           
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}              
         
       - name: Git Checkout
         uses: actions/checkout@v3
