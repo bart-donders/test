@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   
 env:
-  BUILD_CONFIGURATION: 'Release' # Debug or Release
+  BUILD_CONFIGURATION: 'Debug' # Debug or Release
   #OCTO_PACKAGE_VERSION: '1.2.6'
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
   SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
@@ -51,12 +51,12 @@ jobs:
         id: get_OCTO_PACKAGE_VERSION
         run: |
           echo ${{ env.OCTO_PACKAGE_VERSION }}  " as OCTO_PACKAGE_VERSION: "
-      - name: Early exit
-        run: |
-          gh run cancel ${{ github.run_id }}
-          gh run watch ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}              
+      #- name: Early exit
+      #  run: |
+      #    gh run cancel ${{ github.run_id }}
+      #    gh run watch ${{ github.run_id }}
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}              
         
       - name: Git Checkout
         uses: actions/checkout@v3
