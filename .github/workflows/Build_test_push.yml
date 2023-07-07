@@ -41,6 +41,7 @@ jobs:
           $version = $version.Replace('/','-').Replace('_','-')
           if ($version.Length > 18) { $version = $version.Substring(0,18) }
           echo $version >> $env:GITHUB_ENV
+          echo $version
       - name: Early exit
         run: |
           gh run cancel ${{ github.run_id }}
