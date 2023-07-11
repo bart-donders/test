@@ -3,12 +3,10 @@ name: Build, test, push to MyGet, create release in Octopus
 on:
   # Triggers the workflow on push or pull request events
   push:
-    branches: [ test ] # Add "main" later
-  #pull_request:
-  #  branches: [ main, test ]
-    
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    branches: main
+  pull_request:
+    branches: main
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   
 env:
   BUILD_CONFIGURATION: 'Debug' # Debug or Release
