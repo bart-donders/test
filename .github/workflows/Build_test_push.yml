@@ -100,10 +100,10 @@ jobs:
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
           octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
 
-      - name: Push to MyGet
-        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
-        #run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
+      #- name: Push to MyGet
+      #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+      #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
+      #  #run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
