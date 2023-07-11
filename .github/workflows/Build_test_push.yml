@@ -20,7 +20,6 @@ jobs:
     name: 'Build, test, push and create release'
     runs-on: windows-latest
     env:
-      DOTNET_VERSION: '6.0.401'
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
@@ -42,23 +41,14 @@ jobs:
           if ($version.Length > 18) { $version = $version.Substring(0,18) }
           echo OCTO_PACKAGE_VERSION=$version >> $env:GITHUB_ENV
           echo $version
-      - name: Check OCTO_PACKAGE_VERSION
-        run: |
-          Write-Output 'OCTO_PACKAGE_VERSION: ' ${{ env.OCTO_PACKAGE_VERSION }}
-      - name: Early exit
-        run: |
-          gh run cancel ${{ github.run_id }}
-          gh run watch ${{ github.run_id }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                 
-      
+
       - name: Git Checkout
         uses: actions/checkout@v3
 
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: '6.0.x'
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1        
@@ -136,6 +126,10 @@ jobs:
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
           slack-message: "Error tijdens CI/CD (${{ env.BUILD_CONFIGURATION }} version ${{ env.OCTO_PACKAGE_VERSION }}) voor: ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"            
+          
+      #- name: Check OCTO_PACKAGE_VERSION
+      #  run: |
+      #    Write-Output 'OCTO_PACKAGE_VERSION: ' ${{ env.OCTO_PACKAGE_VERSION }}
           
       #- name: Dump GitHub context
       #  env:
