@@ -1,7 +1,6 @@
 name: Build, test, push to MyGet, create release in Octopus
 
 on:
-  # Triggers the workflow on push or pull request events
   push:
     branches: main
   pull_request:
