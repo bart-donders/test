@@ -1,8 +1,8 @@
 name: Build, test, push to MyGet, create release in Octopus
 
 on:
-  #push:
-  #  branches: main
+  push:
+    branches: main
   pull_request:
     branches: main
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
