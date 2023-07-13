@@ -33,7 +33,7 @@ jobs:
       OCTO_PACKAGE_VERSION: ${{ steps.SET_OCTO_PACKAGE_VERSION.outputs.OCTO_PACKAGE_VERSION }}
 
     steps:
-      - name: Set environment variable OCTO_PACKAGE_VERSION # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
+      - name: Set environment and outut variables OCTO_PACKAGE_VERSION # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
         id: SET_OCTO_PACKAGE_VERSION
         run: |
           chcp 65001 # Set code page to utf-8
@@ -69,10 +69,10 @@ jobs:
           git status
           dotnet --version
           msbuild /version     
-          Write-Output "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
-          Write-Output "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
-          Write-Output "GITHUB_REF_NAME: " ${{ github.ref_name }}
-          Write-Output "GITHUB_SHA: " ${{ github.sha }}   
+          echo "Nuget cache hit: " ${{ steps.nuget-cache.outputs.cache-hit }}
+          echo "GITHUB_RUN_NUMBER: " ${{ github.run_number }}
+          echo "GITHUB_REF_NAME: " ${{ github.ref_name }}
+          echo "GITHUB_SHA: " ${{ github.sha }}   
 
       - name: Nuget restore solution and NuGet packages
         run: nuget restore ${{ env.SOLUTION_NAME }}.sln -Verbosity quiet
@@ -123,9 +123,6 @@ jobs:
     needs: Build # Needs 'succeful' Build job, but...
     if: ${{!success()}} # ...only if that one fails
     steps:
-      - name: Check OCTO_PACKAGE_VERSION
-        run: |
-          Write-Output 'OCTO_PACKAGE_VERSION: ' ${{ needs.Build.outputs.OCTO_PACKAGE_VERSION }}
       - name: Notify Slack of failed CI/CD run
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -134,7 +131,11 @@ jobs:
           
       #- name: Check OCTO_PACKAGE_VERSION
       #  run: |
-      #    Write-Output 'OCTO_PACKAGE_VERSION: ' ${{ env.OCTO_PACKAGE_VERSION }}
+      #    echo 'OCTO_PACKAGE_VERSION: ' ${{ env.OCTO_PACKAGE_VERSION }}
+      
+      #- name: Check OCTO_PACKAGE_VERSION in dependent job
+      #  run: |
+      #    echo 'OCTO_PACKAGE_VERSION: ' ${{ needs.Build.outputs.OCTO_PACKAGE_VERSION }}
           
       #- name: Dump GitHub context
       #  env:
