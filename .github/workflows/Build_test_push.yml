@@ -50,7 +50,7 @@ jobs:
       - name: Set environment variable OCTO_PACKAGE_CHANNEL # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
         run: |
           chcp 65001 # Set code page to utf-8
-          $refname = ${{ github.ref_name }} # run checkout first!
+          $refname = "${{ github.ref_name }}" # run checkout first!
           $channel = "Development"
           if ($refname.ToLower().Contains("main")) { $channel = "Full Versions" }
           echo OCTO_PACKAGE_CHANNEL=$channel >> $env:GITHUB_ENV
