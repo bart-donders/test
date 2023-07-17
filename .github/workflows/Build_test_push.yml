@@ -49,7 +49,7 @@ jobs:
           chcp 65001 # Set code page to utf-8
           $refname = ${{ github.ref_name }}
           $channel = "Development"
-          if ($refname.ToLower().Contains("main"} { $channel = "Full Versions" }
+          if ($refname.ToLower().Contains("main")) { $channel = "Full Versions" }
           echo OCTO_PACKAGE_CHANNEL=$channel >> $env:GITHUB_ENV
           echo $channel
           
