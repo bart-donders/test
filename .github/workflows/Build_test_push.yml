@@ -118,7 +118,7 @@ jobs:
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run:  octo create-release --project="CDV" --space="Calculus" --channel=${{ env.OCTO_PACKAGE_CHANNEL }} --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
+      #  run:  octo create-release --project="CDV" --space="Calculus" --channel="${{ env.OCTO_PACKAGE_CHANNEL }}" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
       
       - name: Notify Slack of successful CI/CD run
         uses: slackapi/slack-github-action@v1.24.0
