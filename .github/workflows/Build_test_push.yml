@@ -21,6 +21,8 @@ jobs:
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
+      MYGET_TIMEOUT: '300' # seconds, default 300
+      OCTOPUS_REPO: 'https://octopusdeploy.topicuszorg.nl/'      
       
     outputs:
       OCTO_PACKAGE_VERSION: ${{ steps.SET_OCTO_PACKAGE_VERSION.outputs.OCTO_PACKAGE_VERSION }}
@@ -106,11 +108,11 @@ jobs:
 
       #- name: Push to MyGet
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
+      #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} -Timeout ${{ env.MYGET_TIMEOUT }}
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run:  octo create-release --project="CDV" --space="Calculus" --channel="${{ env.OCTO_PACKAGE_CHANNEL }}" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
+      #  run:  octo create-release --project=CDV --server=${{ env.OCTOPUS_REPO }} --space=Calculus --channel="${{ env.OCTO_PACKAGE_CHANNEL }}" --packagesFolder=${{ runner.temp }}\octo_packages\*.nupkg --version=${{ env.OCTO_PACKAGE_VERSION }} --packageVersion=${{ env.OCTO_PACKAGE_VERSION }} --apiKey=${{ secrets.CALCULUS_GITHUB_OCTOPUS_API_KEY }}        
       
       - name: Notify Slack of successful CI/CD run
         uses: slackapi/slack-github-action@v1.24.0
