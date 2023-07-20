@@ -21,13 +21,6 @@ jobs:
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
       MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
-      OCTOPUS_API_KEY: credentials('octopus-calculus-apikey')
-      OCTOPUS_CLI_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
-      OCTOPUS_SPACE: 'Calculus'
-      OCTOPUS_SPACE_ID: '5'
-      OCTOPUS_PROJECT: 'CDV'
-      OCTOPUS_SERVER: 'https://octopusdeploy.topicuszorg.nl/'
-      OCTOPUS_FOLDER: 'TestConsoleApp'
       
     outputs:
       OCTO_PACKAGE_VERSION: ${{ steps.SET_OCTO_PACKAGE_VERSION.outputs.OCTO_PACKAGE_VERSION }}
@@ -108,13 +101,12 @@ jobs:
       - name: Dotnet Publish and Octo pack for .Net (Core) projects          
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
         run: |
-          dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }}
-          octo pack --id=${{ env.OCTOPUS_FOLDER }} --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\${{ env.OCTOPUS_FOLDER }} --overwrite # overwrite: package file alreaady exists, just for testing
+          dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\TestConsoleApp
+          octo pack --id=TestConsoleApp --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\TestConsoleApp --overwrite # overwrite: package file alreaady exists, just for testing
 
       #- name: Push to MyGet
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
       #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} # -Timeout (default 300 seconds)
-      #  #run: dotnet nuget push ${{ runner.temp }}\octo_packages\*.nupkg --api-key ${{ secrets.ORG_MYGET_API_TOKEN }} -s ${{ env.MYGET_REPO }} # --timeout (default 300 seconds)
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
