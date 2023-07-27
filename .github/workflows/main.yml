@@ -1,0 +1,61 @@
+name: PR validation for branche main or productie # Zie https://confluence.topicus.nl/display/AWS/AWS+Modules+op+Github+Actions
+run-name: ${{ github.actor }} is validating PR for branche main or productie
+ 
+on:
+  push:
+    branches: [ master, test_bash ]
+  pull_request:
+    branches: [ master, test_bash ]
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab    
+ 
+defaults:
+  run:
+    shell: bash
+ 
+permissions:
+  id-token: write
+  contents: read
+ 
+jobs:
+  pr-merge-check:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Set environment variable PROJECT_ENVIRONMENT # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
+        run: |
+          refname = "${{ github.base_ref }}"
+          environment = "acceptatie"
+          if [$refname = "productie"];
+            environment = "productie"
+          fi
+          echo "PROJECT_ENVIRONMENT=$environment" >> env:GITHUB_ENV
+          echo $environment 
+          
+      - name: Starting
+        run: echo Starting AWS pipeline for ${{ github.event.repository.name }}-${{ github.ref_name }} (${{ env.PROJECT_ENVIRONMENT }})
+ 
+      #- name: ⚙ Checkout branch
+      #  uses: actions/checkout@v3
+ 
+      #- name: ✨ Initialize the AWS Modules pipeline
+      #  uses: topicushealthcare/aws-modules-action/init@master
+      #  id: aws-modules-init
+      #  with:
+      #    aws_modules_version: 'v6.39.0'
+      #    aws_modules_app_secret: ${{secrets.AWS_MODULES_CREDENTIALS_TOKEN}}
+ 
+      #- name: Checkout an external module
+      #  uses: topicushealthcare/aws-modules-action/checkout-aws-module@v1
+      #  with:
+      #    repository_name: aws-example-external-modules
+      #    module_version: v0.0.5
+      #    external_module: "true"
+      #    github_app_access_token: ${{ steps.aws-modules-init.outputs.aws-modules-app-token }}
+ 
+      #- name: ✅ Validate the project
+      #  uses: topicushealthcare/aws-modules-action/validate@master
+      #  with:
+      #    aws_environment: ${{ env.PROJECT_ENVIRONMENT }}
