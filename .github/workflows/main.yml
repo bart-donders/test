@@ -1,4 +1,4 @@
-name: PR validation for branche main or productie # Zie https://confluence.topicus.nl/display/AWS/AWS+Modules+op+Github+Actions
+name: PR validation for branch main or productie # Zie https://confluence.topicus.nl/display/AWS/AWS+Modules+op+Github+Actions
 run-name: ${{ github.actor }} is validating PR for branche main or productie
  
 on:
@@ -31,8 +31,6 @@ jobs:
         run: echo "PROJECT_ENVIRONMENT='productie'" >> $GITHUB_ENV
       - name: Reset environment variable PROJECT_ENVIRONMENT for productie
         run: echo ${{ env.PROJECT_ENVIRONMENT }}
-          
-          echo "ENV_NAME=ENV_VALUE" >> "${GITHUB_ENV}"
           
       - name: Starting
         run: echo Starting AWS pipeline for ${{ github.event.repository.name }}-${{ github.ref_name }} (${{ env.PROJECT_ENVIRONMENT }})
