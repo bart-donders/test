@@ -33,7 +33,7 @@ jobs:
         run: echo ${{ env.PROJECT_ENVIRONMENT }}
           
       - name: Starting
-        run: echo Starting AWS pipeline for ${{ github.event.repository.name }}-${{ github.ref_name }} (${{ env.PROJECT_ENVIRONMENT }})
+        run: echo "Starting AWS pipeline for ${{ github.event.repository.name }}-${{ github.ref_name }} (${{ env.PROJECT_ENVIRONMENT }})"
  
       #- name: ⚙ Checkout branch
       #  uses: actions/checkout@v3
