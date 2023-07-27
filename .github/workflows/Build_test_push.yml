@@ -1,4 +1,5 @@
 name: Build, test, push to MyGet, create release in Octopus
+run-name: ${{ github.actor }} is running Build, test, push to MyGet, create release in Octopus
 
 on:
   #push:
@@ -37,7 +38,7 @@ jobs:
           if ($version.Length > 18) { $version = $version.Substring(0,18) }
           echo OCTO_PACKAGE_VERSION=$version >> $env:GITHUB_ENV
           echo OCTO_PACKAGE_VERSION=$version >> $env:GITHUB_OUTPUT
-          echo $version
+          echo "OCTO_PACKAGE_VERSION: " $version
           
       - name: Set environment variable OCTO_PACKAGE_CHANNEL # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
         run: |
@@ -46,7 +47,7 @@ jobs:
           $channel = "Development"
           if ($refname.ToLower().Contains("main")) { $channel = "Full Versions" }
           echo OCTO_PACKAGE_CHANNEL=$channel >> $env:GITHUB_ENV
-          echo $channel
+          echo "OCTO_PACKAGE_CHANNEL: " $channel
           
       - name: Git Checkout
         uses: actions/checkout@v3
