@@ -24,15 +24,13 @@ jobs:
       group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
-      - name: Set environment variable PROJECT_ENVIRONMENT # https://stackoverflow.com/questions/61858388/how-do-i-set-an-enviroment-variable-in-github-action-on-a-windows-server
-        run: |
-          let refname="${{ github.base_ref }}"
-          let environment="acceptatie"
-          if [$refname = "productie"];
-            let environment="productie"
-          fi
-          echo "PROJECT_ENVIRONMENT=$environment" >> env:GITHUB_ENV
-          echo $environment 
+      - name: Set environment variable PROJECT_ENVIRONMENT (default)
+        run: echo "PROJECT_ENVIRONMENT=acceptatie" >> env:GITHUB_ENV
+      - name: Reset environment variable PROJECT_ENVIRONMENT for productie
+        if: ${{ github.base_ref == 'productie' }}       
+        run: echo "PROJECT_ENVIRONMENT=productie" >> env:GITHUB_ENV
+      - name: Reset environment variable PROJECT_ENVIRONMENT for productie
+        run: echo ${{ env.PROJECT_ENVIRONMENT }}
           
       - name: Starting
         run: echo Starting AWS pipeline for ${{ github.event.repository.name }}-${{ github.ref_name }} (${{ env.PROJECT_ENVIRONMENT }})
