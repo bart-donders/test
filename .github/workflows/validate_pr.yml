@@ -25,10 +25,10 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Set environment variable PROJECT_ENVIRONMENT (default)
-        run: echo "PROJECT_ENVIRONMENT='acceptatie'" >> $GITHUB_ENV
+        run: echo "PROJECT_ENVIRONMENT=acceptatie" >> $GITHUB_ENV
       - name: Reset environment variable PROJECT_ENVIRONMENT for productie
-        if: ${{ github.base_ref == 'productie' }}       
-        run: echo "PROJECT_ENVIRONMENT='productie'" >> $GITHUB_ENV
+        if: ${{ github.base_ref == productie }}       
+        run: echo "PROJECT_ENVIRONMENT=productie" >> $GITHUB_ENV
       - name: Show environment variable PROJECT_ENVIRONMENT
         run: echo "PROJECT_ENVIRONMENT ${{ env.PROJECT_ENVIRONMENT }}"
           
