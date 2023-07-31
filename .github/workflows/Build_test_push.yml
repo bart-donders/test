@@ -114,14 +114,14 @@ jobs:
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
-          slack-message: "CI/CD version ${{ env.OCTO_PACKAGE_VERSION }} succesvol afgesloten voor ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"      
+          slack-message: "CI/CD voor version ${{ env.OCTO_PACKAGE_VERSION }} succesvol afgesloten voor ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"   
 
       - name: Notify Slack of failed CI/CD run
         if: ${{ !success() }} # Only if an earlier step fails
         uses: slackapi/slack-github-action@v1.24.0
         with:
           channel-id: ${{ env.SLACK_BOT_CHANNEL }}
-          slack-message: "Error tijdens CI/CD version ${{ env.OCTO_PACKAGE_VERSION }} voor ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"
+          slack-message: "Error tijdens CI/CD voor version ${{ env.OCTO_PACKAGE_VERSION }} voor ${{ github.repository }} (<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}| Details>)"        
 
       #- name: Check OCTO_PACKAGE_VERSION
       #  run: |
