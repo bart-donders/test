@@ -45,7 +45,7 @@ jobs:
           echo "OCTO_PACKAGE_CHANNEL: " $channel
           
       - name: Git Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       - name: Setup Dotnet
         uses: actions/setup-dotnet@v3
