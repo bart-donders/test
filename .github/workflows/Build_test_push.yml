@@ -5,6 +5,7 @@ on:
   #push:
   #  branches: main
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: main
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   
@@ -15,6 +16,7 @@ env:
 
 jobs:
   Build:
+    if: github.event.pull_request.draft == false # Don't run on draft pull requests
     name: 'Build, test, push and create release'
     runs-on: windows-latest
     env:
