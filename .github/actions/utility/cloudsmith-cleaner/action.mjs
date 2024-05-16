@@ -68,7 +68,8 @@ export async function clean(options) {
 			|| (pkg.format === 'docker' && pkg.type_display === 'image' && !pkg.parent && options.pkg_filter_process_dockerimage_without_parents)
 			|| pkg.format === 'maven'
 			|| pkg.format === 'npm'
-			|| pkg.format === 'raw';
+			|| pkg.format === 'raw'
+		        || pkg.format === 'nuget'; // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw.
 	}
 
 	/**
@@ -86,6 +87,8 @@ export async function clean(options) {
 			return pkg?.version;
 		} else if (pkg.format === 'raw') {
 			return pkg?.tags?.version?.[0];
+		} else if (pkg.format === 'nuget') {
+			return pkg?.version;
 		}
 	}
 
