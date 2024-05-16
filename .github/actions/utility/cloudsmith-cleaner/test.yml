@@ -1,0 +1,27 @@
+name: "test action"
+on:
+  workflow_call:
+jobs:
+  test:
+    name: "test"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: 'run action'
+        uses: ./.github/actions/utility/cloudsmith-cleaner
+        with:
+          dry_run: false
+          repo_name: "viplive"
+          repo_owner: "topicus-healthcare"
+          pkg_api_fetch_query: ""
+          pkg_filter_name_regex: "^.*$"
+          pkg_filter_format_regex: "^.*$"
+          pkg_filter_versiontag_regex: "^.+-SNAPSHOT$"
+          pkg_filter_versiontag_regex_allow_missing: true
+          pkg_filter_process_dockerimage_without_parents: true
+          pkg_delete_versiontag_exists_after_days: 21
+          pkg_delete_versiontag_missing_after_days: 0
+          cloudsmith_username: "${{ secrets.VIPLIVE_CLOUDSMITH_USERNAME }}"
+          cloudsmith_api_key: "${{ secrets.VIPLIVE_CLOUDSMITH_TOKEN }}"
+          cloudsmith_docker_registry: "https://docker.cloudsmith.io"
