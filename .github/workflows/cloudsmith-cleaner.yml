@@ -3,6 +3,9 @@ name: "cloudsmith cleaner"
 on:
   #schedule:
   #  - cron: '0 0 * * *'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: main  
   workflow_dispatch:
     inputs:
       dry_run:
@@ -21,13 +24,13 @@ jobs:
       - name: "Clean packages"
         uses: test/.github/actions/utility/cloudsmith-cleaner@master
         with:
-          dry_run: ${{ inputs.dry_run || false }}
+          dry_run: true # ${{ inputs.dry_run || false }}
           repo_name: "calculus"
           repo_owner: "calculus"
           pkg_api_fetch_query: ""
           pkg_filter_name_regex: "^.*$"
           pkg_filter_format_regex: "^.*$"
-          pkg_filter_versiontag_regex: "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}-.*$"          
+          pkg_filter_versiontag_regex: "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}-.+$"          
           pkg_filter_versiontag_regex_allow_missing: true
           pkg_filter_process_dockerimage_without_parents: ${{ inputs.process_dockerimage_without_parents || false }}
           pkg_delete_versiontag_exists_after_days: 28
