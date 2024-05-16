@@ -4,9 +4,9 @@ run-name: ${{ github.actor }} is running Build, test, push to Cloudsmith, create
 on:
   #push:
   #  branches: main
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: main
+  #pull_request:
+  #  types: [opened, synchronize, reopened, ready_for_review]
+  #  branches: main
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   
 env:
