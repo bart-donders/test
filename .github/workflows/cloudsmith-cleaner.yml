@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Clean packages"
-        uses: test/.github/actions/utility/cloudsmith-cleaner@latest
+        uses: bart-donders/test/.github/actions/utility/cloudsmith-cleaner@latest
         with:
           dry_run: true # ${{ inputs.dry_run || false }}
           repo_name: "calculus"
