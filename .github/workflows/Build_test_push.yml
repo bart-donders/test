@@ -10,7 +10,7 @@ on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   
 env:
-  BUILD_CONFIGURATION: 'Debug' # Debug or Release
+  BUILD_CONFIGURATION: 'Release' # Debug or Release
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
   SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
 
@@ -103,10 +103,6 @@ jobs:
         run: |
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\TestConsoleApp
           octo pack --id=TestConsoleApp --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\TestConsoleApp --overwrite # overwrite: package file alreaady exists, just for testing
-
-      #- name: Push to MyGet
-      #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} -Timeout ${{ env.MYGET_TIMEOUT }}
 
       - name: Push to Cloudsmith
         if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
