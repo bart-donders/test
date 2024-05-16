@@ -26,7 +26,7 @@ jobs:
         with:
           dry_run: true # ${{ inputs.dry_run || false }}
           repo_name: "calculus"
-          repo_owner: "calculus"
+          repo_owner: "topicus-healthcare"
           pkg_api_fetch_query: ""
           pkg_filter_name_regex: "^.*$"
           pkg_filter_format_regex: "^.*$"
