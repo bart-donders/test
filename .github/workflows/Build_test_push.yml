@@ -1,5 +1,5 @@
-name: Build, test, push to MyGet, create release in Octopus
-run-name: ${{ github.actor }} is running Build, test, push to MyGet, create release in Octopus
+name: Build, test, push to Cloudsmith, create release in Octopus
+run-name: ${{ github.actor }} is running Build, test, push to Cloudsmith, create release in Octopus
 
 on:
   #push:
@@ -23,8 +23,8 @@ jobs:
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
-      MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
-      MYGET_TIMEOUT: '300' # seconds, default 300
+      CLOUDSMITH_REPO: 'https://nuget.cloudsmith.io/~topicus-healthcare/calculus/v3/index.json'
+      CLOUDSMITH_TIMEOUT: '900' # seconds, default 300
       OCTOPUS_REPO: 'https://octopusdeploy.topicuszorg.nl/'      
       
     steps:
