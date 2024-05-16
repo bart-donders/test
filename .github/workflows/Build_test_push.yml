@@ -107,6 +107,10 @@ jobs:
       #- name: Push to MyGet
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
       #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} -Timeout ${{ env.MYGET_TIMEOUT }}
+
+      - name: Push to Cloudsmith
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }} -Source ${{ env.CLOUDSMITH_REPO }} -Timeout ${{ env.CLOUDSMITH_TIMEOUT }} -SkipDuplicate
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
