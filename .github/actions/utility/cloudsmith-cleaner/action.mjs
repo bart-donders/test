@@ -87,7 +87,7 @@ export async function clean(options) {
 			return pkg?.version;
 		} else if (pkg.format === 'raw') {
 			return pkg?.tags?.version?.[0];
-		} else if (pkg.format === 'nuget' || pkg.format === 'nupkg') {
+		} else if (pkg.format === 'nuget' || pkg.format === 'nupkg') { // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw, doe ook maar 'nupkg'...
 			return pkg?.version;
 		}
 	}
@@ -161,8 +161,8 @@ export async function clean(options) {
 	 * @returns string
 	 */
 	const packageToString = (pkg) => {
-		return `[${pkg.format}|${pkg.type_display}][${pkg.identifier_perm}] ${pkg.name}:${packageGetVersionTag(pkg) || '?'} (uploaded: ${new Date(pkg.uploaded_at).toLocaleString('nl')})(${prettyBytes(pkg.size)})`;
-	}
+		return `[${pkg.format}|${pkg.type_display}][${pkg.identifier_perm}] ${pkg.name}:${packageGetVersionTag(pkg) || pkg?.version} (uploaded: ${new Date(pkg.uploaded_at).toLocaleString('nl')})(${prettyBytes(pkg.size)})`;
+	} // Bart 17-05-2024: '?' vervangen door pkg?.version op advies van Leon Lieuw
 
 	/**
 	 * Print a list of packages.
