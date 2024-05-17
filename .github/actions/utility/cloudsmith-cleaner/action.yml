@@ -1,0 +1,86 @@
+name: "cloudsmith cleanup"
+inputs:
+  dry_run:
+    default: true
+    description: "dry run will print affected packages without actually changing anything"
+
+  repo_name:
+    default: "iz"
+    description: "the repo to scan for packages"
+  repo_owner:
+    default: "topicus-healthcare"
+    description: "the owner of the repository"
+
+  pkg_api_fetch_query:
+    default: ""
+    description: "optional filter query to speed up retrieving packages from the cloudsmith API. Further filtering will be done locally"
+
+  pkg_filter_name_regex:
+    default: "^.*$"
+    description: "filters are INCLUSIVE; all filters need to be passed. Pass through packages that match this name"
+  pkg_filter_format_regex:
+    default: "^.*$"
+    description: "pass through packages that match this format"
+  pkg_filter_versiontag_regex:
+    default: "^.+-SNAPSHOT$"
+    description: "pass through packages that match this '<type>:<tag value>' combination"
+  pkg_filter_versiontag_regex_allow_missing:
+    default: "true"
+    description: "pass through packages that have no tag at all which would otherwise fail the regex. Useful to remove dangling packages"
+  pkg_filter_process_dockerimage_without_parents:
+    default: "false"
+    description: "docker images without a parent can be processed by the script. this is more risky, because you rely on the docker API always returning correct manifest data, or else images may get deleted incorrectly and corrupt manifests"
+
+  pkg_delete_versiontag_exists_after_days:
+    default: "30"
+    description: "packages with a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
+  pkg_delete_versiontag_missing_after_days:
+    default: "30"
+    description: "packages without a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
+
+  cloudsmith_username:
+    required: true
+    description: "Docker username key to use."
+  cloudsmith_api_key:
+    required: true
+    description: "API key to use. Needs permission to list, quarantine and delete packages"
+  cloudsmith_docker_registry:
+    required: true
+    description: "Docker registry to use."
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+    - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+      with:
+        node-version: 20
+    - run: npm install axios@1.1.3 pretty-bytes@6.0.0
+      shell: bash
+    - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      with:
+        script: |
+          const { clean, Options } = await import('${{ github.workspace }}/.github/actions/utility/cloudsmith-cleaner/action.mjs');
+          
+          let options = new Options();
+          options.cloudsmith_username = '${{ inputs.cloudsmith_username }}';
+          options.cloudsmith_api_key = '${{ inputs.cloudsmith_api_key }}';
+          options.repo_name = '${{ inputs.repo_name }}';
+          options.repo_owner = '${{ inputs.repo_owner }}';
+          options.cloudsmith_docker_registry = '${{ inputs.cloudsmith_docker_registry }}';
+          options.pkg_api_fetch_query = '${{ inputs.pkg_api_fetch_query }}';
+          options.pkg_filter_name_regex = '${{ inputs.pkg_filter_name_regex }}';
+          options.pkg_filter_format_regex = '${{ inputs.pkg_filter_format_regex }}';
+          options.pkg_filter_process_dockerimage_without_parents = ('${{ inputs.pkg_filter_process_dockerimage_without_parents }}' === 'true'); 
+          options.pkg_filter_versiontag_regex = '${{ inputs.pkg_filter_versiontag_regex }}';
+          options.pkg_filter_versiontag_regex_allow_missing = '${{ inputs.pkg_filter_versiontag_regex_allow_missing }}';
+          options.pkg_delete_versiontag_exists_after_days = '${{ inputs.pkg_delete_versiontag_exists_after_days }}';
+          options.pkg_delete_versiontag_missing_after_days = '${{ inputs.pkg_delete_versiontag_missing_after_days }}';
+          options.dry_run = !('${{ inputs.dry_run }}' === 'false'); // Explicitly keep the dry_run unless an exact 'false' value is given.
+          options.print();
+          
+          try {
+            await clean(options);
+          } catch(err) {
+            core.setFailed(err);
+          }

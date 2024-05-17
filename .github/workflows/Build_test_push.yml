@@ -1,16 +1,16 @@
-name: Build, test, push to MyGet, create release in Octopus
-run-name: ${{ github.actor }} is running Build, test, push to MyGet, create release in Octopus
+name: Build, test, push to Cloudsmith, create release in Octopus
+run-name: ${{ github.actor }} is running Build, test, push to Cloudsmith, create release in Octopus
 
 on:
   #push:
   #  branches: main
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: main
+  #pull_request:
+  #  types: [opened, synchronize, reopened, ready_for_review]
+  #  branches: main
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   
 env:
-  BUILD_CONFIGURATION: 'Debug' # Debug or Release
+  BUILD_CONFIGURATION: 'Release' # Debug or Release
   SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}      
   SLACK_BOT_CHANNEL: 'CMK620AJU,GFE5FM8MT' # calculus-deploys, calculus-robots
 
@@ -23,8 +23,8 @@ jobs:
       SOLUTION_NAME: 'TestConsoleApp\TestConsoleApp' # 'CDV'
       MSBUILD_FLAGS_1: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /p:WarningsAsErrors="CS0168;CS0169;CS0219;CS1998" /warnaserror:MSB3247;'
       MSBUILD_FLAGS: '/m /nr:false /clp:ErrorsOnly /p:DebugSymbols=true /p:DebugType=pdbonly /warnaserror:MSB3247'      
-      MYGET_REPO: 'https://topicushealthcare.myget.org/F/calculus/api/v2'
-      MYGET_TIMEOUT: '300' # seconds, default 300
+      CLOUDSMITH_REPO: 'https://nuget.cloudsmith.io/~topicus-healthcare/calculus/v3/index.json'
+      CLOUDSMITH_TIMEOUT: '900' # seconds, default 300
       OCTOPUS_REPO: 'https://octopusdeploy.topicuszorg.nl/'      
       
     steps:
@@ -104,9 +104,9 @@ jobs:
           dotnet publish --no-build ${{ env.SOLUTION_NAME }} --configuration ${{ env.BUILD_CONFIGURATION }} --output ${{ runner.temp }}\TestConsoleApp
           octo pack --id=TestConsoleApp --version=${{ env.OCTO_PACKAGE_VERSION }} --outFolder=${{ runner.temp }}\octo_packages --basePath=${{ runner.temp }}\TestConsoleApp --overwrite # overwrite: package file alreaady exists, just for testing
 
-      #- name: Push to MyGet
-      #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
-      #  run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_MYGET_API_KEY }} -Source ${{ env.MYGET_REPO }} -Timeout ${{ env.MYGET_TIMEOUT }}
+      - name: Push to Cloudsmith
+        if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
+        run: nuget push ${{ runner.temp }}\octo_packages\*.nupkg -ApiKey ${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }} -Source ${{ env.CLOUDSMITH_REPO }} -Timeout ${{ env.CLOUDSMITH_TIMEOUT }} -SkipDuplicate
         
       #- name: Create a release in Octopus Deploy
       #  if: ${{ env.BUILD_CONFIGURATION == 'Release' }}

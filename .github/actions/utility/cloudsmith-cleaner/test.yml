@@ -1,0 +1,27 @@
+name: "test action"
+on:
+  workflow_call:
+jobs:
+  test:
+    name: "test"
+    runs-on: ubuntu-22.04
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+      - name: 'run action'
+        uses: ./.github/actions/utility/cloudsmith-cleaner
+        with:
+          dry_run: true
+          repo_name: "calculus"
+          repo_owner: "topicus-healthcare"
+          pkg_api_fetch_query: ""
+          pkg_filter_name_regex: "^.*$"
+          pkg_filter_format_regex: "^.*$"
+          pkg_filter_versiontag_regex: "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}-.+$"
+          pkg_filter_versiontag_regex_allow_missing: true
+          pkg_filter_process_dockerimage_without_parents: true
+          pkg_delete_versiontag_exists_after_days: 28
+          pkg_delete_versiontag_missing_after_days: 0
+          cloudsmith_username: "calculus-cicd"
+          cloudsmith_api_key: "${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }}"
+          cloudsmith_docker_registry: "https://docker.cloudsmith.io"
