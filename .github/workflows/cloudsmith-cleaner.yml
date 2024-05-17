@@ -16,6 +16,10 @@ on:
         type: boolean
         default: false
         description: "Process docker images without a parent too. A bit more risky because images could get deleted if the docker API gives wrong information, so double check your run."
+      pkg_delete_versiontag_exists_after_days:
+        type: string
+        default: "56" # 8 weeks
+        description: "packages with a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
       
 jobs:
   build:
@@ -34,7 +38,7 @@ jobs:
           pkg_filter_versiontag_regex: "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4}-.+$"          
           pkg_filter_versiontag_regex_allow_missing: true
           pkg_filter_process_dockerimage_without_parents: ${{ inputs.process_dockerimage_without_parents || false }}
-          pkg_delete_versiontag_exists_after_days: 56
+          pkg_delete_versiontag_exists_after_days: ${{ inputs.pkg_delete_versiontag_exists_after_days }}
           pkg_delete_versiontag_missing_after_days: 0
           cloudsmith_username: "calculus-cicd"
           cloudsmith_api_key: "${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }}"
