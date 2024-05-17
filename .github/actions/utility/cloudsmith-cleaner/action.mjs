@@ -69,7 +69,7 @@ export async function clean(options) {
 			|| pkg.format === 'maven'
 			|| pkg.format === 'npm'
 			|| pkg.format === 'raw'
-		        || pkg.format === 'nuget' || pkg.format === 'nupkg'; // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw, doe ook maar 'nupkg'...
+		        || pkg.format === 'nuget'; // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw
 	}
 
 	/**
@@ -87,7 +87,7 @@ export async function clean(options) {
 			return pkg?.version;
 		} else if (pkg.format === 'raw') {
 			return pkg?.tags?.version?.[0];
-		} else if (pkg.format === 'nuget' || pkg.format === 'nupkg') { // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw, doe ook maar 'nupkg'...
+		} else if (pkg.format === 'nuget') { // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw
 			return pkg?.version;
 		}
 	}
