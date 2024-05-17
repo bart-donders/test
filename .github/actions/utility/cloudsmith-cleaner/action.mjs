@@ -69,7 +69,7 @@ export async function clean(options) {
 			|| pkg.format === 'maven'
 			|| pkg.format === 'npm'
 			|| pkg.format === 'raw'
-		        || pkg.format === 'nuget'; // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw
+			|| pkg.format === 'nuget'; // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw
 	}
 
 	/**
@@ -88,7 +88,7 @@ export async function clean(options) {
 		} else if (pkg.format === 'raw') {
 			return pkg?.tags?.version?.[0];
 		} else if (pkg.format === 'nuget') { // Bart 16-05-2024: 'nuget' toegevoegd op advies van Leon Lieuw
-			return pkg?.version;
+			return pkg?.version;			
 		}
 	}
 
@@ -107,7 +107,7 @@ export async function clean(options) {
 				}
 
 				// Filter on package name regex.
-				if (!pkg.name.match(`${options.pkg_filter_name_regex}`)) {
+				if (pkg.name && !pkg.name.match(`${options.pkg_filter_name_regex}`)) {
 					console.log("FILTERED: filter name regex not match: " + packageToString(pkg))
 					return false;
 				}
@@ -142,14 +142,6 @@ export async function clean(options) {
 					return false;
 				}
 
-				// Check if it's the latest package
-				const packagesList = packages.filter(p => p.name === pkg.name);
-				const isLatestPackage = packagesList.length === 1 ? true : packagesList.every(p => Date.parse(pkg.uploaded_at) >= Date.parse(p.uploaded_at));
-				if (isLatestPackage) {
-				    console.log("FILTERED: Latest package for: " + packageToString(pkg));
-				    return false;
-				}
-			
 				return true;
 			}
 		);
@@ -161,8 +153,8 @@ export async function clean(options) {
 	 * @returns string
 	 */
 	const packageToString = (pkg) => {
-		return `[${pkg.format}|${pkg.type_display}][${pkg.identifier_perm}] ${pkg.name}:${packageGetVersionTag(pkg) || pkg?.version} (uploaded: ${new Date(pkg.uploaded_at).toLocaleString('nl')})(${prettyBytes(pkg.size)})`;
-	} // Bart 17-05-2024: '?' vervangen door pkg?.version op advies van Leon Lieuw
+		return `[${pkg.format}|${pkg.type_display}][${pkg.identifier_perm}] ${pkg.name}:${packageGetVersionTag(pkg) || '?'} (uploaded: ${new Date(pkg.uploaded_at).toLocaleString('nl')})(${prettyBytes(pkg.size)})`;
+	}
 
 	/**
 	 * Print a list of packages.
@@ -200,7 +192,7 @@ export async function clean(options) {
 					err = `${response.response.status}, ${JSON.stringify(response.response.data)}`;
 					console.log(`Failed to delete package: ${packageToString(pkg)}\n\t\t=> ${err}`);
 				});
-			
+
 			//Delete all children connected to this package
 			if (pkg.children) {
 				deletePackages(pkg.children);
@@ -266,6 +258,7 @@ export async function clean(options) {
 		console.log(`Adding manifests for docker...`);
 		await packagesAddManifest(packages);
 
+		console.log(`Filtering packages...`);
 		const packagesToDelete = packagesFilter(packages);
 		console.log(`Packages to be deleted: ${packagesToDelete.length} (${prettyBytes(packagesGetSize(packagesToDelete))})`);
 		printPackages(packagesToDelete);
