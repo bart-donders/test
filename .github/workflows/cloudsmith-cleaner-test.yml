@@ -1,0 +1,40 @@
+name: "cloudsmith cleaner"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        default: true
+        description: "Dry run will print affected packages without actually changing anything."
+      process_dockerimage_without_parents:
+        type: boolean
+        default: false
+        description: "Process docker images without a parent too. A bit more risky because images could get deleted if the docker API gives wrong information, so double check your run."
+      pkg_delete_versiontag_exists_after_days:
+        type: string
+        default: "56" # 8 weeks
+        description: "packages with a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
+      
+jobs:
+  build:
+    name: "cloudsmith cleaner"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Clean packages"
+        uses: bart-donders/test/.github/actions/utility/cloudsmith-cleaner/test.yml@main
+        with:
+          dry_run: ${{ inputs.dry_run || false }}
+          repo_name: "calculus"
+          repo_owner: "topicus-healthcare"
+          pkg_api_fetch_query: ""
+          pkg_filter_name_regex: "^.*$"
+          pkg_filter_format_regex: "^.*$"
+          pkg_filter_versiontag_regex: "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{2,4}-.+$" # {2,4} does not select the masters, e.g. "6.1234.0-master"
+          pkg_filter_versiontag_regex_allow_missing: true
+          pkg_filter_process_dockerimage_without_parents: ${{ inputs.process_dockerimage_without_parents || false }}
+          pkg_delete_versiontag_exists_after_days: ${{ inputs.pkg_delete_versiontag_exists_after_days }}
+          pkg_delete_versiontag_missing_after_days: 0
+          cloudsmith_username: "calculus-cicd"
+          cloudsmith_api_key: "${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }}"
+          cloudsmith_docker_registry: "https://docker.cloudsmith.io"          
