@@ -5,7 +5,7 @@ inputs:
     description: "dry run will print affected packages without actually changing anything"
 
   repo_name:
-    default: "iz"
+    default: "calculus"
     description: "the repo to scan for packages"
   repo_owner:
     default: "topicus-healthcare"
@@ -32,10 +32,10 @@ inputs:
     description: "docker images without a parent can be processed by the script. this is more risky, because you rely on the docker API always returning correct manifest data, or else images may get deleted incorrectly and corrupt manifests"
 
   pkg_delete_versiontag_exists_after_days:
-    default: "30"
+    default: "91" # 13 weeks
     description: "packages with a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
   pkg_delete_versiontag_missing_after_days:
-    default: "30"
+    default: "91" # 13 weeks
     description: "packages without a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
 
   cloudsmith_username:
