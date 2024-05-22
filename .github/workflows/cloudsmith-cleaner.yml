@@ -41,5 +41,5 @@ jobs:
           pkg_delete_versiontag_exists_after_days: ${{ inputs.pkg_delete_versiontag_exists_after_days }}
           pkg_delete_versiontag_missing_after_days: 0
           cloudsmith_username: "calculus-cicd"
-          cloudsmith_api_key: "${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY }}"
+          cloudsmith_api_key: "${{ secrets.CALCULUS_GITHUB_CLOUDSMITH_API_KEY_OLD }}"
           cloudsmith_docker_registry: "https://docker.cloudsmith.io"          
