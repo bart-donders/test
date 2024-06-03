@@ -18,7 +18,7 @@ on:
         description: "Process docker images without a parent too. A bit more risky because images could get deleted if the docker API gives wrong information, so double check your run."
       pkg_delete_versiontag_exists_after_days:
         type: string
-        default: "56" # 8 weeks
+        default: "" # 8 weeks
         description: "packages with a tag, that pass through the filter, that have been quarantine for this many days will be deleted permanently"
       
 jobs:
